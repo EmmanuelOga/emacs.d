@@ -249,7 +249,9 @@
 
 (use-package flycheck :straight t)
 
-(use-package lsp-mode :straight t)
+(use-package which-key
+  :straight t
+  :config (which-key-mode))
 
 ;; Various language modes.
 (use-package dockerfile-mode :straight t)
@@ -263,6 +265,33 @@
 (use-package terraform-mode :straight t)
 (use-package toml-mode :straight t)
 (use-package yaml-mode :straight t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LSP Mode.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+(setq lsp-keymap-prefix "C-l")
+
+(use-package lsp-mode
+  :straight t
+  :hook ((python-mode . lsp)
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode)
+
+(use-package lsp-treemacs
+  :straight t
+  :commands lsp-treemacs-errors-list)
+
+(use-package dap-mode
+  :straight t)
+
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+;; ...
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Variables changed through customization.
