@@ -133,6 +133,8 @@
 (use-package no-littering :straight t)
 (use-package zerodark-theme :straight t)
 
+(use-package magit :straight t)
+
 (use-package selectrum
   :straight t
   :defer t
@@ -152,19 +154,19 @@
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
   :init
-  (global-company-mode 1))
+  (global-company-mode +1))
 
-;; Package `company-lsp' provides a Company backend for `lsp-mode'.
-;; It's configured automatically by `lsp-mode'.
-(use-package company-lsp
+(use-package company-box
   :straight t
-  :after company)
+  :after company
+  :hook
+  (company-mode . company-box-mode))
 
 ;; Package `prescient' is a library for intelligent sorting and
 ;; filtering in various contexts.
 (use-package prescient
   :straight t
-  :after company
+  :after company-box
   :config
   (prescient-persist-mode +1)
   (setq prescient-history-length 1000))
@@ -173,7 +175,7 @@
 ;; filtering for candidates in Company completions.
 (use-package company-prescient
   :straight t
-  :after company
+  :after company-box
   :config
   ;; Use `prescient' for Company menus.
   (company-prescient-mode +1))
@@ -202,8 +204,7 @@
   :init
   (beacon-mode))
 
-(use-package clojure-mode
-  :straight t)
+(use-package clojure-mode :straight t)
 
 ;; Package `helpful' provides a complete replacement for the built-in
 ;; Emacs help facility which provides much more contextual information
@@ -242,6 +243,14 @@
                               "C:/java/jdk-13.0.2+8/source/java.base"
                               "C:/java/saxon/9-9-1-6-source")))
 
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1))
+
+(use-package flycheck :straight t)
+
+(use-package lsp-mode :straight t)
+
 ;; Various language modes.
 (use-package dockerfile-mode :straight t)
 (use-package gitconfig-mode :straight t)
@@ -268,7 +277,7 @@
  '(column-number-mode t)
  '(custom-enabled-themes '(zerodark))
  '(custom-safe-themes
-   '("846ef3695c42d50347884515f98cc359a7a61b82a8d0c168df0f688cf54bf089" "48c8e318a70466bb6d46509c8d6d458c047ee8107541b8de973cb3cb048b9592" default))
+   '("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "846ef3695c42d50347884515f98cc359a7a61b82a8d0c168df0f688cf54bf089" "48c8e318a70466bb6d46509c8d6d458c047ee8107541b8de973cb3cb048b9592" default))
  '(size-indication-mode t)
  '(tool-bar-mode nil))
 (custom-set-faces
@@ -276,6 +285,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Source Code Pro" :foundry "outline" :slant normal :weight normal :height 120 :width normal))))
  '(rainbow-delimiters-depth-1-face ((t (:foreground "dark orange"))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "deep pink"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "chartreuse"))))
@@ -283,8 +293,7 @@
  '(rainbow-delimiters-depth-5-face ((t (:foreground "yellow"))))
  '(rainbow-delimiters-depth-6-face ((t (:foreground "orchid"))))
  '(rainbow-delimiters-depth-7-face ((t (:foreground "spring green"))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "sienna1"))))
- '(default ((t (:family "Source Code Pro" :foundry "outline" :slant normal :weight normal :height 120 :width normal)))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "sienna1")))))
 
 (set-face-background 'show-paren-match (face-background 'default))
 (set-face-foreground 'show-paren-match "#f00")
