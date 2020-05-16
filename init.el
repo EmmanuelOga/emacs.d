@@ -11,6 +11,18 @@
 ;; Shift-Arrows to move windows.
 (windmove-default-keybindings)
 
+;; `winner' provides an undo/redo stack for window configurations,
+;; with undo and redo being C-c left and C-c right,
+;; respectively.
+(winner-mode +1)
+
+;; Remember last cursor position on file.
+(save-place-mode +1)
+
+;; When visiting a file, revert it if it has updated and no edits and
+;; it has changed.
+(global-auto-revert-mode +1)
+
 ;; Tabs
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
@@ -54,6 +66,9 @@
 (set-keyboard-coding-system 'utf-8-unix)
 (setq default-buffer-file-coding-system 'utf-8-unix)
 
+;; Don't make lockfiles: those annoying files with # in the path!
+(setq create-lockfiles nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Load packages.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -72,6 +87,13 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Package `buffer-move' provides simple commands to swap Emacs
+;; windows: `buf-move-up', `buf-move-down', `buf-move-left',
+;; `buf-move-right'.
+(use-package buffer-move :straight t)
 
 ;; Dim unused buffers
 (use-package dimmer
@@ -118,13 +140,43 @@
   ;; This doesn't actually load Selectrum.
   (selectrum-mode +1))
 
+(use-package company
+  :straight t
+  :config
+  (setq company-idle-delay 0.5)
+  (setq company-show-numbers t)
+  (setq company-tooltip-limit 10)
+  (setq company-minimum-prefix-length 2)
+  (setq company-tooltip-align-annotations t)
+  ;; invert the navigation direction if the the completion popup-isearch-match
+  ;; is displayed on top (happens near the bottom of windows)
+  (setq company-tooltip-flip-when-above t)
+  :init
+  (global-company-mode 1))
+
+;; Package `company-lsp' provides a Company backend for `lsp-mode'.
+;; It's configured automatically by `lsp-mode'.
+(use-package company-lsp
+  :straight t
+  :after company)
+
 ;; Package `prescient' is a library for intelligent sorting and
 ;; filtering in various contexts.
 (use-package prescient
   :straight t
+  :after company
   :config
   (prescient-persist-mode +1)
   (setq prescient-history-length 1000))
+
+;; Package `company-prescient' provides intelligent sorting and
+;; filtering for candidates in Company completions.
+(use-package company-prescient
+  :straight t
+  :after company
+  :config
+  ;; Use `prescient' for Company menus.
+  (company-prescient-mode +1))
 
 ;; Package `selectrum-prescient' provides intelligent sorting and
 ;; filtering for candidates in Selectrum menus.
@@ -150,6 +202,32 @@
   :init
   (beacon-mode))
 
+(use-package clojure-mode
+  :straight t)
+
+;; Package `helpful' provides a complete replacement for the built-in
+;; Emacs help facility which provides much more contextual information
+;; in a better format.
+(use-package helpful
+  :straight t
+  :bind
+  (;; Remap standard commands.
+   ([remap describe-function] . #'helpful-callable)
+   ([remap describe-variable] . #'helpful-variable)
+   ([remap describe-symbol]   . #'helpful-symbol)
+   ([remap describe-key]      . #'helpful-key)
+
+   ;; Suggested bindings from the documentation at
+   ;; https://github.com/Wilfred/helpful.
+
+   :map help-map
+   ("F" . #'helpful-function)
+   ("M-f" . #'helpful-macro)
+   ("C" . #'helpful-command)
+
+   :map global-map
+   ("C-c C-d" . #'helpful-at-point)))
+
 (use-package cider
   :straight t
   :config
@@ -163,6 +241,19 @@
   (setq cider-jdk-src-paths '("C:/java/jdk-13.0.2+8/source"
                               "C:/java/jdk-13.0.2+8/source/java.base"
                               "C:/java/saxon/9-9-1-6-source")))
+
+;; Various language modes.
+(use-package dockerfile-mode :straight t)
+(use-package gitconfig-mode :straight t)
+(use-package gitignore-mode :straight t)
+(use-package go-mode :straight t)
+(use-package json-mode :straight t)
+(use-package pip-requirements :straight t)
+(use-package pkgbuild-mode :straight t)
+(use-package ssh-config-mode :straight t)
+(use-package terraform-mode :straight t)
+(use-package toml-mode :straight t)
+(use-package yaml-mode :straight t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Variables changed through customization.
@@ -198,3 +289,4 @@
 (set-face-background 'show-paren-match (face-background 'default))
 (set-face-foreground 'show-paren-match "#f00")
 (set-face-attribute 'show-paren-match nil :weight 'extra-bold)
+
