@@ -103,13 +103,26 @@
 
 (use-package rainbow-delimiters :straight t)
 
+(use-package magit :straight t)
+
 ;; File and outline tree.
 (use-package treemacs
   :straight t
   :config
-  (global-set-key [f8] 'treemacs))
+  (global-set-key [f8] 'treemacs)
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode t)
+  (pcase (cons (not (null (executable-find "git")))
+               (not (null treemacs-python-executable)))
+    (`(t . t) (treemacs-git-mode 'deferred))
+    (`(t . _) (treemacs-git-mode 'simple))))
 
-(use-package treemacs-evil :straight t)
+(use-package treemacs-evil        :straight t :after treemacs evil)
+(use-package treemacs-magit       :straight t :after treemacs magit)
+(use-package treemacs-projectile  :straight t :after treemacs projectile)
+(use-package treemacs-icons-dired :straight t :after treemacs dired
+  :config (treemacs-icons-dired-mode))
 
 (use-package evil
   :straight t
@@ -122,6 +135,13 @@
   :config
   (setq evil-default-state 'emacs)
   (evil-mode 1)
+
+  ;; Manually enable motion mode in different file types.
+  ;; Alternatively I could enable by default and blacklist modes...
+  (push '("clojure*" . motion) evil-buffer-regexps)
+  (push '("emacs*" . motion) evil-buffer-regexps)
+  (push '("magit*" . emacs) evil-buffer-regexps)
+  
   ;; Remove enter and space from the motion map.
   (defun -move-key (keymap-from keymap-to key)
     "Moves key binding from one keymap to another, deleting from the old location. "
@@ -131,9 +151,8 @@
   (-move-key evil-motion-state-map evil-normal-state-map " "))
 
 (use-package no-littering :straight t)
-(use-package zerodark-theme :straight t)
 
-(use-package magit :straight t)
+(use-package zerodark-theme :straight t)
 
 (use-package selectrum
   :straight t
@@ -252,6 +271,15 @@
 (use-package which-key
   :straight t
   :config (which-key-mode))
+
+(use-package smooth-scrolling
+  :straight t
+  :config
+  (smooth-scrolling-mode 1))
+
+(use-package gist :straight t)
+
+(use-package deadgrep :straight t)
 
 ;; Various language modes.
 (use-package dockerfile-mode :straight t)
