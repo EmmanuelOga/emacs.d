@@ -136,10 +136,13 @@
   (setq evil-default-state 'emacs)
   (evil-mode 1)
 
-  ;; Manually enable motion mode in different file types.
-  ;; Alternatively I could enable by default and blacklist modes...
-  (push '("clojure*" . motion) evil-buffer-regexps)
-  (push '("emacs*" . motion) evil-buffer-regexps)
+  (evil-set-initial-state 'xquery-mode 'normal)
+  (evil-set-initial-state 'markdown-mode 'normal)
+  (evil-set-initial-state 'java-mode 'normal)
+  (evil-set-initial-state 'clojure-mode 'normal)
+  (evil-set-initial-state 'emacs-lisp-mode 'normal)
+  (evil-set-initial-state 'nxml-mode 'normal)
+  (evil-set-initial-state 'ttl-mode 'normal)
   (push '("magit*" . emacs) evil-buffer-regexps)
   
   ;; Remove enter and space from the motion map.
@@ -151,6 +154,8 @@
   (-move-key evil-motion-state-map evil-normal-state-map " "))
 
 (use-package no-littering :straight t)
+
+(use-package xquery-mode :straight t)
 
 (use-package zerodark-theme :straight t)
 
@@ -262,6 +267,29 @@
                               "C:/java/jdk-13.0.2+8/source/java.base"
                               "C:/java/saxon/9-9-1-6-source")))
 
+(use-package hydra
+  :straight t)
+
+(use-package cider-hydra
+  :straight t
+  :after hydra
+  :config
+  (add-hook 'clojure-mode-hook #'cider-hydra-mode))
+
+(use-package yasnippet
+  :straight t)
+
+(use-package clj-refactor
+  :straight t
+  :after yasnippet
+  :config
+  (defun clj-refactor-hook ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (add-hook 'clojure-mode-hook #'clj-refactor-hook))
+
 (use-package doom-modeline
   :straight t
   :init (doom-modeline-mode 1))
@@ -318,6 +346,21 @@
 (use-package dap-mode
   :straight t)
 
+(use-package ttl-mode
+  :straight (:host github :repo "jeeger/ttl-mode")
+  :config
+  (autoload 'ttl-mode "ttl-mode" "Major mode for OWL or Turtle files" t)
+
+  ; Turn on font lock when in ttl mode
+  (add-hook 'ttl-mode-hook 'turn-on-font-lock)
+
+  (setq auto-mode-alist
+        (append
+         (list
+          '("\\.n3" . ttl-mode)
+          '("\\.ttl" . ttl-mode))
+         auto-mode-alist)))
+
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 ;; ...
 
@@ -350,9 +393,6 @@
  '(rainbow-delimiters-depth-5-face ((t (:foreground "yellow"))))
  '(rainbow-delimiters-depth-6-face ((t (:foreground "orchid"))))
  '(rainbow-delimiters-depth-7-face ((t (:foreground "spring green"))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "sienna1")))))
-
-(set-face-background 'show-paren-match (face-background 'default))
-(set-face-foreground 'show-paren-match "#f00")
-(set-face-attribute 'show-paren-match nil :weight 'extra-bold)
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "sienna1"))))
+ '(show-paren-match ((t (:background "ivory" :foreground "firebrick" :weight ultra-bold)))))
 
